@@ -1,3 +1,7 @@
+html,body{
+  height: 100%
+  width: 100%;
+}
 .logo {
   height: 100px;
 }
@@ -25,5 +29,5 @@
 .titulo-grafica {
   font-family: 'Montserrat';
   font-weight: bold;
-  font-size: 3rem;
+  font-size: 2vh;
 }
