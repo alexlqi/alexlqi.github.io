@@ -46,6 +46,8 @@ function getTitulo(){
 
 function start(){
   metrica2 = metricaSelect.node().value
+  Anio++
+  frame2(Anio)
   anioTI=setInterval(function(){
     frame2(Anio);
     Anio++
@@ -121,7 +123,20 @@ function render2(data) {
 
   yAxisCall = d3.axisLeft(y)
                 .ticks(3)
-                .tickFormat(d => d + ((metrica == 'oficial') ? '' : ''))
+                .tickFormat((d) => {
+                  switch(metricaSelect.node().value){
+                    case 'PIB':
+                      str='$' + d/1000000 + 'mdp'
+                    break
+                    case 'PIBperCapita':
+                      str='$' + d
+                    break
+                    case 'Poblacion':
+                      str= d
+                    break
+                  }
+                  return str 
+                })
   yAxisGroup.transition()
             .duration(2000)
             .call(yAxisCall)
