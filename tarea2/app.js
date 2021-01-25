@@ -1,12 +1,14 @@
-// cargamos los datos de PIB estatales por año
+// definimos las variable globales
 var graf,ancho_total,alto_total,margins,ancho,alto,svg,g,y,x,color,xAxisGroup,yAxisGroup,titulo
-metricaSelect = d3.select('#metrica')
-metrica2 = metricaSelect.node().value
-Anio=2003
-anioTI=0
-transitionTime=1000
-changeYearTime=2000
+var metricaSelect = d3.select('#metrica')
+var metrica2 = metricaSelect.node().value
+var Anio=2003
+var anioTI=0
+var transitionTime=1000
+var changeYearTime=2000
+var dataArray = []
 
+// cargamos los datos estatales por año
 d3.csv('tarea2_1.csv')
 .then(function(data) {
   // limpiamos los datos
@@ -22,12 +24,104 @@ d3.csv('tarea2_1.csv')
 
   color.domain(data.map(d => d.Estado))
   
-  frame2(2003);
-
   // V. Despliegue
-  //frame()
+  frame2(2003);
 })
 
+// configurar D3 inicialmente
+config()
+
+// IV. Carga de datos de los selects
+metricaSelect.on('change', () => {
+  metrica = metricaSelect.node().value
+  reset()
+})
+
+
+// evento para reacomodar la visualización al redimensionar la ventana
+window.addEventListener('resize', ()=>{
+  config()
+  frame2(Anio)
+});
+
+
+// I. Configuración de los elementos que usará D3
+function config(){
+  var orientation = (screen.orientation || {}).type || screen.mozOrientation || screen.msOrientation;
+  graf = d3.select('#graf')
+  contenedor = d3.select('#contenedor')
+
+  ancho_total = contenedor.style('width').slice(0, -2) - contenedor.style('padding-left').slice(0, -2)*2
+  alto_total = ancho_total * 9 / 16
+
+
+  graf.style('width', `${ ancho_total }px`)
+      .style('height', `${ alto_total }px`)
+
+  switch(orientation){
+    case 'landscape-primary':
+    case 'landscape-secondary':
+      margins = { top: 30, left: 60, right: 15, bottom: 130 }
+      fontSize = '1.5em'
+    break
+    case 'portrait-secondary':
+    case 'portrait-primary':
+      margins = { top: 30, left: 60, right: 15, bottom: 130 }
+      fontSize = '1.1em'
+    break
+    case 'undefined':
+    default:
+      margins = { top: 30, left: 50, right: 15, bottom: 130 }
+      fontSize = '1em'
+    break
+  }
+
+  ancho = ancho_total - margins.left - margins.right
+  alto  = alto_total - margins.top - margins.bottom
+
+  // II. Configuración de Variables globales
+  if(typeof svg == "object") svg.remove()
+
+  svg = graf.append('svg')
+            .style('width', `${ ancho_total }px`)
+            .style('height', `${ alto_total }px`)
+
+
+  g = svg.append('g')
+          .attr('transform', `translate(${ margins.left }, ${ margins.top })`)
+          .attr('width', ancho + 'px')
+          .attr('height', alto + 'px')
+
+  y = d3.scaleLinear()
+            .range([alto, 0])
+
+  x = d3.scaleBand()
+        .range([0, ancho])
+        .paddingInner(0.1)
+        .paddingOuter(0.3)
+
+  color = d3.scaleOrdinal()
+            // .range(['red', 'green', 'blue', 'yellow'])
+            // https://bl.ocks.org/pstuffa/3393ff2711a53975040077b7453781a9
+            .range(d3.schemeDark2)
+
+  xAxisGroup = g.append('g')
+                .attr('transform', `translate(0, ${ alto })`)
+                .attr('class', 'eje')
+  yAxisGroup = g.append('g')
+                .attr('class', 'eje')
+
+  titulo = g.append('text')
+            //.attr('x', `${ancho / 8}px`)
+            .attr('x', `0px`)
+            .attr('y', '0')
+            .attr('text-anchor', 'right')
+            .text('PIB estatal anual')
+            .attr('class', 'titulo-grafica')
+            .style('font-size',fontSize)
+}
+
+// función para devolver el título dependiendo de la métrica
 function getTitulo(){
   str=''
   switch(metricaSelect.node().value){
@@ -45,6 +139,7 @@ function getTitulo(){
   return str;
 }
 
+//función para INICIAR la visualización interactiva
 function start(){
   metrica2 = metricaSelect.node().value
   Anio++
@@ -56,16 +151,19 @@ function start(){
   },changeYearTime);
 }
 
+//función para DETENER la visualización interactiva
 function stop(){
   clearInterval(anioTI)
 }
 
+//función para RESTABLECER la visualización interactiva
 function reset(){
   Anio=2003
   metrica2 = metricaSelect.node().value
   frame2(Anio);
 }
 
+//función para inicializar la visualización
 function frame2(Anio){
   dataframe = dataArray
   dataframe = d3.filter(dataArray, d => d.Anio == Anio)
@@ -87,6 +185,7 @@ function frame2(Anio){
   render2(dataframe)
 }
 
+// III. función para renderizar la visualización inicializada.
 function render2(data) {
   // function(d, i) { return d }
   // (d, i) => d
@@ -149,117 +248,4 @@ function render2(data) {
             .attr('y', '-5px')
             .attr('text-anchor', 'end')
             .attr('transform', 'rotate(-70)')
-}
-
-// I. Configuración
-config()
-
-dataArray = []
-
-// (1) Variables globales para determinar que mostrar y
-//     poder obtener los datos del select
-region = 'todas'
-regionSelect = d3.select('#region')
-
-metrica = 'oficial'
-metricaSelect = d3.select('#metrica')
-
-ascendente = false
-
-// III. render (update o dibujo)
-
-// IV. Carga de datos
-regionSelect.on('change', () => {
-  region = regionSelect.node().value
-  reset()
-})
-
-metricaSelect.on('change', () => {
-  metrica = metricaSelect.node().value
-  reset()
-})
-
-function cambiaOrden() {
-  ascendente = !ascendente
-  reset()
-}
-
-window.addEventListener('resize', ()=>{
-  config()
-  frame2(Anio)
-});
-
-function config(){
-  var orientation = (screen.orientation || {}).type || screen.mozOrientation || screen.msOrientation;
-  graf = d3.select('#graf')
-  contenedor = d3.select('#contenedor')
-
-  ancho_total = contenedor.style('width').slice(0, -2) - contenedor.style('padding-left').slice(0, -2)*2
-  alto_total = ancho_total * 9 / 16
-
-
-  graf.style('width', `${ ancho_total }px`)
-      .style('height', `${ alto_total }px`)
-
-  switch(orientation){
-    case 'landscape-primary':
-    case 'landscape-secondary':
-      margins = { top: 30, left: 60, right: 15, bottom: 130 }
-      fontSize = '1.5em'
-    break
-    case 'portrait-secondary':
-    case 'portrait-primary':
-      margins = { top: 30, left: 60, right: 15, bottom: 130 }
-      fontSize = '1.1em'
-    break
-    case 'undefined':
-    default:
-      margins = { top: 30, left: 50, right: 15, bottom: 130 }
-      fontSize = '1em'
-    break
-  }
-
-  ancho = ancho_total - margins.left - margins.right
-  alto  = alto_total - margins.top - margins.bottom
-
-  // II. Variables globales
-  if(typeof svg == "object") svg.remove()
-
-  svg = graf.append('svg')
-            .style('width', `${ ancho_total }px`)
-            .style('height', `${ alto_total }px`)
-
-
-  g = svg.append('g')
-          .attr('transform', `translate(${ margins.left }, ${ margins.top })`)
-          .attr('width', ancho + 'px')
-          .attr('height', alto + 'px')
-
-  y = d3.scaleLinear()
-            .range([alto, 0])
-
-  x = d3.scaleBand()
-        .range([0, ancho])
-        .paddingInner(0.1)
-        .paddingOuter(0.3)
-
-  color = d3.scaleOrdinal()
-            // .range(['red', 'green', 'blue', 'yellow'])
-            // https://bl.ocks.org/pstuffa/3393ff2711a53975040077b7453781a9
-            .range(d3.schemeDark2)
-
-  xAxisGroup = g.append('g')
-                .attr('transform', `translate(0, ${ alto })`)
-                .attr('class', 'eje')
-  yAxisGroup = g.append('g')
-                .attr('class', 'eje')
-
-  titulo = g.append('text')
-            //.attr('x', `${ancho / 8}px`)
-            .attr('x', `0px`)
-            .attr('y', '0')
-            .attr('text-anchor', 'right')
-            .text('PIB estatal anual')
-            .attr('class', 'titulo-grafica')
-            .style('font-size',fontSize)
 }
