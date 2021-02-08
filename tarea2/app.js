@@ -62,17 +62,17 @@ function config(){
   switch(orientation){
     case 'landscape-primary':
     case 'landscape-secondary':
-      margins = { top: 30, left: 60, right: 15, bottom: 130 }
+      margins = { top: 40, left: 60, right: 15, bottom: 130 }
       fontSize = '1.5em'
     break
     case 'portrait-secondary':
     case 'portrait-primary':
-      margins = { top: 30, left: 60, right: 15, bottom: 130 }
+      margins = { top: 40, left: 60, right: 15, bottom: 130 }
       fontSize = '1.1em'
     break
     case 'undefined':
     default:
-      margins = { top: 30, left: 50, right: 15, bottom: 130 }
+      margins = { top: 40, left: 50, right: 15, bottom: 130 }
       fontSize = '1em'
     break
   }
@@ -115,7 +115,7 @@ function config(){
   titulo = g.append('text')
             //.attr('x', `${ancho / 8}px`)
             .attr('x', `0px`)
-            .attr('y', '0')
+            .attr('y', '-5px')
             .attr('text-anchor', 'right')
             .text('PIB estatal anual')
             .attr('class', 'titulo-grafica')
