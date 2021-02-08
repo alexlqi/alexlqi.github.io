@@ -47,6 +47,7 @@ window.addEventListener('resize', ()=>{
 
 // I. Configuración de los elementos que usará D3
 function config(){
+  console.log(slider);
   var orientation = (screen.orientation || {}).type || screen.mozOrientation || screen.msOrientation;
   graf = d3.select('#graf')
   contenedor = d3.select('#contenedor')
@@ -165,6 +166,7 @@ function reset(){
 
 //función para inicializar la visualización
 function frame2(Anio){
+  slider.value(Anio)
   dataframe = dataArray
   dataframe = d3.filter(dataArray, d => d.Anio == Anio)
 
