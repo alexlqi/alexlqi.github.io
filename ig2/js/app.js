@@ -99,6 +99,10 @@ function selectData(elem){
 
 	console.log(d3.select('.descripcion1.'+btn.dataset.ctrl));
 	if(typeof svg == "object"){
+		d3.selectAll("rect").transition()
+	      	.duration(1000)
+	        .style('height', '0px')
+	        .style('y', d => `${y(0)}px`)
 		d3.select("svg").transition().duration(1000).style("opacity","0").on("end", function(){
 			svg.remove()
 			switch(btn.dataset.ctrl){
