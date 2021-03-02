@@ -249,6 +249,7 @@ function render2(data) {
           .style('height', d => (alto - y(d[metrica2])) + 'px')
           .style('fill', d => color(d.Estado))
           .style('width', d => `${x.bandwidth()}px`)
+      
   bars.exit()
       .transition()
       .duration(2000)
@@ -256,25 +257,6 @@ function render2(data) {
         .style('y', d => `${y(0)}px`)
         .style('fill', '#000000')
       .remove()
-
-  bars.on('mouseenter', function (s, i) {
-        console.log(s,i)
-          d3.select(this)
-              .transition()
-              .duration(300)
-              .attr('opacity', 0.6)
-              .attr('x', (a) => xScale(a.language) - 5)
-              .attr('width', xScale.bandwidth() + 10)
-
-          svg.append('line')
-              .attr('x1', 0)
-              .attr('y1', y)
-              .attr('x2', width)
-              .attr('y2', y)
-              .attr('stroke', 'red')
-
-          // this is only part of the implementation, check the source code
-      })
 
   bars2.enter()
       .append('rect')
